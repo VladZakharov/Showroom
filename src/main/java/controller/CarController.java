@@ -1,6 +1,7 @@
 package controller;
 
 import model.car.*;
+import model.customer.Customer;
 import model.customer.CustomerDemands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -59,6 +60,7 @@ public class CarController {
         CustomerDemands d = demandsRepo.findOne(demandsId);
         if (d == null) return "/404";
         List<Car> cars = getCars(d);
+        model.addAttribute("cust_id", ((Customer) entityManager.createNativeQuery("select * from customers c where c.id in (select cd.customers_id from customers_CustomerDemands cd where cd.demands_id=" + d.getId() + ")", Customer.class).getSingleResult()).getId());
         model.addAttribute("cars", cars);
         return "cars";
     }
@@ -150,15 +152,15 @@ public class CarController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String saveCar(@RequestParam("brand") long brand_id,
-                            @RequestParam("color") long color_id,
-                            @RequestParam("tc") long condition_id,
-                            @RequestParam("year") String year,
-                            @RequestParam("price") String price,
-                            @RequestParam("acc") String acc,
-                            @RequestParam("ev") String ev,
-                            @RequestParam("hp") String hp,
-                            @RequestParam("ts") String ts,
-                            @RequestParam("extras") String extras) {
+                          @RequestParam("color") long color_id,
+                          @RequestParam("tc") long condition_id,
+                          @RequestParam("year") String year,
+                          @RequestParam("price") String price,
+                          @RequestParam("acc") String acc,
+                          @RequestParam("ev") String ev,
+                          @RequestParam("hp") String hp,
+                          @RequestParam("ts") String ts,
+                          @RequestParam("extras") String extras) {
 //        Car car = new Car();
 //        car.setBrand(carBrandRepo.findOne(brand_id));
 //        car.setCondition(conditionRepo.findOne(condition_id));
@@ -199,16 +201,19 @@ public class CarController {
     }
 
     public List<Car> getCars(CustomerDemands d) {
-        return getCars(d.getMinTopSpeed(), d.getMaxTopSpeed(),
+        return getCars(
+                d.getMinTopSpeed(), d.getMaxTopSpeed(),
                 d.getMinPrice(), d.getMaxPrice(),
                 d.getMinHorsePower(), d.getMaxHorsePower(),
                 d.getMinEngineVolume(), d.getMaxEngineVolume());
     }
 
-    public List<Car> getCars(Integer minTS, Integer maxTS,
-                             Integer minP, Integer maxP,
-                             Integer minHP, Integer maxHP,
-                             Integer minEV, Integer maxEV) {
+    public List<Car> getCars(
+            Integer minTS, Integer maxTS,
+            Integer minP, Integer maxP,
+            Integer minHP, Integer maxHP,
+            Integer minEV, Integer maxEV
+    ) {
         String SQL = "SELECT * FROM cars AS c WHERE c.id IN " +
                 "(SELECT s.car_id FROM CarSpecifications AS s";
         boolean first = true;

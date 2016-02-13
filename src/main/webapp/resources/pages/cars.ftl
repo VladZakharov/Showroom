@@ -2,14 +2,16 @@
 
 <#macro content>
 
-<div class="page-bar">
-    <div class="page-toolbar">
-        <div class="btn-group pull-right">
-            <a href="/cars/add" class="btn btn-default btn-sm">
-                <i class="fa fa-plus"></i> Add car</a>
+    <#if !cust_id??>
+    <div class="page-bar">
+        <div class="page-toolbar">
+            <div class="btn-group pull-right">
+                <a href="/cars/add" class="btn btn-default btn-sm">
+                    <i class="fa fa-plus"></i> Add car</a>
+            </div>
         </div>
     </div>
-</div>
+    </#if>
 
     <#list cars as car>
     <div class="portlet blue-hoki box">
@@ -18,6 +20,11 @@
                 <i class="fa fa-cogs"></i>Car Information
             </div>
             <div class="actions">
+                <#if cust_id??>
+                    <a href="/customers/${cust_id}/order/${car.id}" class="btn btn-default btn-sm">
+                        Create order </a>
+                </#if>
+
                 <a href="/cars/${car.id}/edit" class="btn btn-default btn-sm">
                     <i class="fa fa-pencil"></i> Edit </a>
                 <a href="/cars/${car.id}/remove" class="btn btn-default btn-sm">

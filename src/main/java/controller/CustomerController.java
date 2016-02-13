@@ -4,6 +4,8 @@ package controller;
  * Created by vlad on 19.11.15.
  */
 
+import model.car.Car;
+import model.car.CarOrder;
 import model.customer.Customer;
 import model.customer.CustomerDemands;
 import model.customer.CustomerInfo;
@@ -48,11 +50,48 @@ public class CustomerController {
         return "customers";
     }
 
+    @RequestMapping(value = "orders/all")
+    public String getOrders(Model model) {
+        model.addAttribute("orders", entityManager.createNativeQuery("select * from CarOrder", CarOrder.class).getResultList());
+        return "orders";
+    }
+
+    @RequestMapping(value = "/orders/{id}")
+    public String showOrder(@PathVariable("id") long id, Model model) {
+        CarOrder order = (CarOrder) entityManager.createNativeQuery("select * from CarOrder where id=" + id, CarOrder.class).getSingleResult();
+        model.addAttribute("car", entityManager.createNativeQuery("select * from cars where id=" + order.getCar().getId(), Car.class).getSingleResult());
+        model.addAttribute("customer", entityManager.createNativeQuery("select * from customers where id=" + order.getCust().getId(), Customer.class).getSingleResult());
+        return "order";
+    }
+
+    @RequestMapping(value = "/orders/{id}/close")
+    public String closeOrder(@PathVariable("id") long id, Model model) {
+        try {
+            customQueryRepo.execute("delete from CarOrder where id=" + id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "404";
+        }
+        return "redirect:/customers/orders/all";
+    }
+
     @RequestMapping(value = "/{id}")
     public String getCustomer(@PathVariable("id") long id, Model model) {
         Customer customer = customerRepo.findOne(id);
         model.addAttribute("cust", customer);
         return "customer";
+    }
+
+    @RequestMapping(value = "/{id}/order/{car_id}")
+    public String createOrder(@PathVariable("id") long id, @PathVariable("car_id") long car_id, Model model) {
+        long order_id;
+        try {
+            order_id = customQueryRepo.execute("insert into CarOrder (car_id, cust_id) output inserted.id values (" + car_id + ", " + id + ")").getId()[0];
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "404";
+        }
+        return "redirect:/customers/orders/all";
     }
 
     @RequestMapping(value = "/{id}/demands")

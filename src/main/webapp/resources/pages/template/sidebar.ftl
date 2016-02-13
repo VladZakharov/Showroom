@@ -38,15 +38,9 @@
                 </a>
             </li>
             <li>
-                <a href="/finder">
+                <a href="/customers/orders/all">
                     <i class="icon-bar-chart"></i>
-                    <span class="title">Find car</span>
-                </a>
-            </li>
-            <li>
-                <a href="/templates">
-                    <i class="icon-docs"></i>
-                    <span class="title">My templates</span>
+                    <span class="title">Orders</span>
                 </a>
             </li>
             <li class="last ">
