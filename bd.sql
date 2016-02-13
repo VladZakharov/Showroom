@@ -97,3 +97,11 @@ create TABLE customers_CustomerDemands (
     FOREIGN KEY (customers_id) REFERENCES customers (id) ON DELETE CASCADE,
     FOREIGN KEY (demands_id) REFERENCES CustomerDemands (id) ON DELETE CASCADE
 );
+
+create table CarOrder (
+	id bigint IDENTITY(1,1) not null,
+	car_id bigint not null,
+	cust_id bigint not null,
+	FOREIGN key (car_id) references cars,
+	FOREIGN key (cust_id) references customers
+);
